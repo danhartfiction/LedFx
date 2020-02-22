@@ -1,9 +1,9 @@
 from ledfx.effects.audio import AudioReactiveEffect, FREQUENCY_RANGES
-from ledfx.effects.gradient import GradientEffect
+from ledfx.effects.colorrainbow import ColorRainbowEffect 
 import voluptuous as vol
 import numpy as np
 
-class DranoBeatAudioEffect(AudioReactiveEffect, GradientEffect):
+class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
 
     NAME = "DranoBeat"
     CONFIG_SCHEMA = vol.Schema({
@@ -28,3 +28,4 @@ class DranoBeatAudioEffect(AudioReactiveEffect, GradientEffect):
         if magnitude > 1.0:
             magnitude = 1.0
         self.pixels = self.apply_gradient(magnitude)
+        print(self.pixels)
