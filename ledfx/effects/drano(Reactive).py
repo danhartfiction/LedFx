@@ -9,7 +9,6 @@ class DranoBeatAudioEffect(AudioReactiveEffect, GradientEffect):
     CONFIG_SCHEMA = vol.Schema({
         vol.Optional('frequency_range', description='Frequency range for the beat detection', default = 'bass'): vol.In(list(FREQUENCY_RANGES.keys())),
     })
-    print("Testing!")
 
     def config_updated(self, config):
         self._frequency_range = np.linspace(
@@ -21,6 +20,7 @@ class DranoBeatAudioEffect(AudioReactiveEffect, GradientEffect):
 
         # Grab the filtered and interpolated melbank data
         magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
+        print(magnitude)
         # if magnitude > 0.7:
         #     self.pixels = self.apply_gradient(1.0)
         # else:
