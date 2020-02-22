@@ -28,4 +28,7 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
         if magnitude > 1.0:
             magnitude = 1.0
         self.pixels = self.apply_gradient(magnitude)
+        print("Pixels be startring!")
+        print("===========================================")
         print(self.pixels)
+        print("===========================================")
