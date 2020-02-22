@@ -131,7 +131,7 @@ class ColorRainbowEffect(Effect):
         self._gradient_curve = None
 
     def apply_rainbow(self, y):
-        for pixel in self.pixel_count:
+        for pixel in range(self.pixel_count):
             output[pixel] = [0, 255, 0]
 
     def apply_gradient(self, y):
