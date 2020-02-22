@@ -12,6 +12,18 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
         vol.Optional('frequency_range', description='Frequency range for the beat detection', default = 'bass'): vol.In(list(FREQUENCY_RANGES.keys())),
     })
 
+    sampleStartTime = time.time()
+    empty_ticks = 0
+    maxBPM = 180
+    bpm_avg = 60
+    samples = []
+    tick_samples = []
+    bpm_list = []
+    tick_size = 60 / (maxBPM*10)
+    tick_start = sampleStartTime
+    prev_beat = sampleStartTime
+    next_beat = sampleStartTime
+
     def config_updated(self, config):
         self._frequency_range = np.linspace(
             FREQUENCY_RANGES[self.config['frequency_range']].min,
@@ -62,18 +74,18 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
         now = time.time()
         if not hasattr(self, 'beat'):
             print("INIT!")
-            self.sampleStartTime = now
-            self.empty_ticks = 0
-            self.maxBPM = 180
-            self.bpm_avg = 60
-            self.samples = []
-            self.tick_samples = []
-            self.bpm_list = []
+#            self.sampleStartTime = now
+#            self.empty_ticks = 0
+#            self.maxBPM = 180
+#            self.bpm_avg = 60
+#            self.samples = []
+#            self.tick_samples = []
+#            self.bpm_list = []
             self.colormap = np.zeros(shape=(self.pixel_count, 3))
-            self.tick_size = 60 / (self.maxBPM*10)
-            self.tick_start = self.sampleStartTime
-            self.prev_beat = now
-            self.next_beat = now
+#            self.tick_size = 60 / (self.maxBPM*10)
+#            self.tick_start = self.sampleStartTime
+#            self.prev_beat = now
+#            self.next_beat = now
             self.beat = False
 
         # Grab the filtered and interpolated melbank data
