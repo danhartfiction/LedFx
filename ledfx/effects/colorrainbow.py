@@ -17,27 +17,29 @@ class ColorRainbowEffect(Effect):
         vol.Optional('gradient_method', description='Function used to generate gradient', default = 'cubic_ease'): vol.In(["cubic_ease", "bezier"]),
     })
 
-    def apply_rainbow(self):
+    def apply_rainbow(self, dt):
         output = np.zeros(shape=(self.pixel_count, 3))
-        rainbow = []
-        rainbow.append([255, 0, 0])
-        rainbow.append([255, 165, 0])
-        rainbow.append([255, 255, 0])
-        rainbow.append([0, 128, 0])
-        rainbow.append([0, 0, 255])
-        rainbow.append([75, 00, 130])
-        rainbow.append([238, 130, 238])
-        pixels_per_color = int(self.pixel_count / len(rainbow))
-        for i in range(self.pixel_count):
-            index = int(i / pixels_per_color)
-            if index >= len(rainbow):
-                index = len(rainbow) - 1
-            output[i] = [rainbow[index][0], rainbow[index][1], rainbow[index][2]]
-            self.colormap[i] = output[i]
+        if dt < .05:
+            rainbow = []
+            rainbow.append([255, 0, 0])
+            rainbow.append([255, 165, 0])
+            rainbow.append([255, 255, 0])
+            rainbow.append([0, 128, 0])
+            rainbow.append([0, 0, 255])
+            rainbow.append([75, 00, 130])
+            rainbow.append([238, 130, 238])
+            pixels_per_color = int(self.pixel_count / len(rainbow))
+            for i in range(self.pixel_count):
+                index = int(i / pixels_per_color)
+                if index >= len(rainbow):
+                    index = len(rainbow) - 1
+                output[i] = [rainbow[index][0], rainbow[index][1], rainbow[index][2]]
+                self.colormap[i] = output[i]
+        else:
+                for i in range(len(self.colormap)): 
+                    for j in range(3):
+                        self.colormap[i][j] -= 40
+                        if self.colormap[i][j] < 0:
+                            self.colormap[i][j] = 0
+                    output[i] = [self.colormap[i][0], self.colormap[i][1], self.colormap[i][2]]
         return output
-"""            for i in range(len(self.colormap)): 
-                for j in range(3):
-                    self.colormap[i][j] -= 180
-                    if self.colormap[i][j] < 0:
-                        self.colormap[i][j] = 0
-                output[i] = [self.colormap[i][0], self.colormap[i][1], self.colormap[i][2]]"""

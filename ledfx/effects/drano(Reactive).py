@@ -18,41 +18,7 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
             FREQUENCY_RANGES[self.config['frequency_range']].max,
             20)
 
-    def audio_data_updated(self, data):
-        output = np.zeros(shape=(self.pixel_count, 3))
-        for i in range(self.pixel_count):
-            output[i] = [255, 255, 0]
-        self.pixels = output
-"""        if not hasattr(self, 'beat'):
-            print("INIT!")
-            self.sampleStartTime = time.time()
-            self.maxBPM = 180
-            self.samples = []
-            self.tick_samples = []
-            self.bpm_list = []
-            self.colormap = np.zeros(shape=(self.pixel_count, 3))
-            self.tick_size = 60 / (self.maxBPM*10)
-            self.tick_start = self.sampleStartTime
-            self.prev_beat = self.sampleStartTime
-            self.beat = False
-
-        now = time.time()
-        if not hasattr(self, 'next_beat'):
-            print("setting next_beat")
-            self.next_beat = now
-
-        # Grab the filtered and interpolated melbank data
- #       magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
-
-#        self.updateBeat(magnitude, now)
-        if abs(now - self.next_beat) < .1:
-            print(self.pixels[40])
-            self.pixels = self.apply_rainbow()
-        else:
-#            self.pixels = np.zeros(shape=(self.pixel_count, 3))
-            print(self.pixels[40])"""
-
-"""    def updateBeat(self, y, now):
+    def updateBeat(self, y, now):
         self.tick_samples.append(y)
         if now - self.tick_start > self.tick_size:
             tick_avg = statistics.mean(self.tick_samples)
@@ -82,5 +48,26 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
             if len(self.bpm_list) > 24:
                 self.bpm_list = self.bpm_list[8:]
             self.tick_samples = []
-            self.tick_start = now"""
+            self.tick_start = now
 
+    def audio_data_updated(self, data):
+        now = time.time()
+        if not hasattr(self, 'beat'):
+            print("INIT!")
+            self.sampleStartTime = now
+            self.maxBPM = 180
+            self.samples = []
+            self.tick_samples = []
+            self.bpm_list = []
+            self.colormap = np.zeros(shape=(self.pixel_count, 3))
+            self.tick_size = 60 / (self.maxBPM*10)
+            self.tick_start = self.sampleStartTime
+            self.prev_beat = self.sampleStartTime
+            self.next_beat = now - 1000
+            self.beat = False
+
+        # Grab the filtered and interpolated melbank data
+        magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
+
+        self.updateBeat(magnitude, now)
+        self.pixels = self.apply_rainbow(abs(now - self.next_beat))
