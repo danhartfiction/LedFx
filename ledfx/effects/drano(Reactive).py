@@ -20,11 +20,10 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
 
         # Grab the filtered and interpolated melbank data
         magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
-        print(magnitude)
         # if magnitude > 0.7:
         #     self.pixels = self.apply_gradient(1.0)
         # else:
         #     self.pixels = self.apply_gradient(0.0)
         if magnitude > 1.0:
             magnitude = 1.0
-        self.pixels = self.apply_gradient(magnitude)
+        self.pixels = self.apply_rainbow(magnitude)

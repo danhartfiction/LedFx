@@ -17,130 +17,20 @@ class ColorRainbowEffect(Effect):
         vol.Optional('gradient_method', description='Function used to generate gradient', default = 'cubic_ease'): vol.In(["cubic_ease", "bezier"]),
     })
 
-    _gradient_curve = None
-
-    def _comb(self, N, k):
-        N = int(N)
-        k = int(k)
-
-        if k > N or N < 0 or k < 0:
-            return 0
-
-        M = N + 1
-        nterms = min(k, N - k)
-        numerator = 1
-        denominator = 1
-
-        for j in range(1, nterms + 1):
-            numerator *= M - j
-            denominator *= j
-
-        return numerator // denominator
-
-    def _bernstein_poly(self, i, n, t):
-        """The Bernstein polynomial of n, i as a function of t"""
-        return self._comb(n, i) * ( t**(n-i) ) * (1 - t)**i
-
-    def _ease(self, chunk_len, start_val, end_val, slope=1.5):
-        x = np.linspace(0, 1, chunk_len)
-        diff = end_val - start_val
-        pow_x = np.power(x, slope)
-        return diff*pow_x / (pow_x + np.power(1-x, slope)) + start_val
-
-    def _color_ease(self, chunk_len, start_color, end_color):
-        """Makes a coloured block easing from start to end colour"""
-        return np.array([self._ease(chunk_len,
-                                    start_color[i],
-                                    end_color[i]) for i in range(3)])
-
-    def _generate_gradient_curve(self, gradient_colors, gradient_method, gradient_length):
-
-        # Check to see if we have a custom gradient, or a predefined one and
-        # load the colors accordingly
-        if isinstance(gradient_colors, str):
-            gradient_name = gradient_colors
-            gradient_colors = []
-            if GRADIENTS.get(gradient_name):
-                gradient_colors = GRADIENTS.get(gradient_name).get("colors")
-                gradient_method = GRADIENTS.get(gradient_name).get("method", gradient_method)
-            elif COLORS.get(gradient_name):
-                gradient_colors = [gradient_name]
-
-        if not gradient_colors:
-            gradient_colors = GRADIENTS.get('spectral')
-
-        self.rgb_list = np.array([COLORS[color.lower()] for color in gradient_colors]).T
-        n_colors = len(self.rgb_list[0])
-
-        if gradient_method == "bezier":
-            t = np.linspace(0.0, 1.0, gradient_length)
-            polynomial_array = np.array([self._bernstein_poly(i, n_colors-1, t) for i in range(0, n_colors)])
-            polynomial_array = np.fliplr(polynomial_array)
-            gradient = np.array([np.dot(self.rgb_list[0], polynomial_array),
-                                 np.dot(self.rgb_list[1], polynomial_array),
-                                 np.dot(self.rgb_list[2], polynomial_array)])
-            _LOGGER.info(('Generating new gradient curve for {}'.format(gradient_colors)))
-            self._gradient_curve = gradient
-
-        elif gradient_method == "cubic_ease":
-            t = np.zeros(gradient_length)
-            ease_chunks = np.array_split(t, n_colors-1)
-            color_pairs = np.array([(self.rgb_list.T[i], self.rgb_list.T[i+1]) for i in range(n_colors-1)])
-            gradient = np.hstack(self._color_ease(len(ease_chunks[i]), *color_pairs[i]) for i in range(n_colors-1))
-            _LOGGER.info(('Generating new gradient curve for {}'.format(gradient_colors)))
-            self._gradient_curve = gradient
-
-        else:
-            gradient = np.zeros((gradient_length, 3))
-            for i in range(gradient_length):
-                rgb_i = i % n_colors
-                gradient[i] = (self.rgb_list[0][rgb_i], self.rgb_list[1][rgb_i], self.rgb_list[2][rgb_i])
-            self._gradient_curve = gradient.T
-
-    def _gradient_valid(self):
-        if self._gradient_curve is None:
-            return False # Uninitialized gradient
-        if len(self._gradient_curve[0]) != self.pixel_count:
-            return False # Incorrect size
-        return True
-
-    def _validate_gradient(self):
-        if not self._gradient_valid(): 
-            self._generate_gradient_curve(self._config['gradient_name'], self._config['gradient_method'], self.pixel_count)
-
-    def _roll_gradient(self):
-        if self._config['gradient_roll'] == 0:
-            return
-
-        self._gradient_curve = np.roll(
-            self._gradient_curve,
-            self._config['gradient_roll'],
-            axis=1)
-
-    def get_gradient_color(self, point):
-        self._validate_gradient()
-
-        n_colors = len(self.rgb_list[0])
-        polynomial_array = np.array([self._bernstein_poly(i, n_colors-1, point) for i in range(0, n_colors)])
-        return (np.dot(self.rgb_list[0], polynomial_array),
-               np.dot(self.rgb_list[1], polynomial_array),
-               np.dot(self.rgb_list[2], polynomial_array))
-               
-    def config_updated(self, config):
-        """Invalidate the gradient"""
-        self._gradient_curve = None
-
     def apply_rainbow(self, y):
-        output = list()
-        for pixel in range(self.pixel_count):
-            output.append([0, 255, 0])
-
-    def apply_gradient(self, y):
-        self._validate_gradient()
-
-        # Apply and roll the gradient if necessary
-        output = (self._gradient_curve[:][::1]*y).T
-        print(type(output))
-        self._roll_gradient()
-
+        output = np.zeros(shape=(self.pixel_count, 3))
+        rainbow = []
+        rainbow.append([255, 0, 0])
+        rainbow.append([255, 165, 0])
+        rainbow.append([255, 255, 0])
+        rainbow.append([0, 128, 0])
+        rainbow.append([0, 0, 255])
+        rainbow.append([75, 00, 130])
+        rainbow.append([238, 130, 238])
+        pixels_per_color = int(self.pixel_count / len(rainbow))
+        for i in range(self.pixel_count):
+            index = int(i / pixels_per_color)
+            if index >= len(rainbow):
+              index = len(rainbow) - 1
+            output[i] = [rainbow[index][0]*y, rainbow[index][1]*y, rainbow[index][2]*y]
         return output
