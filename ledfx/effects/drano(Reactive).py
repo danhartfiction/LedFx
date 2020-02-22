@@ -2,6 +2,8 @@ from ledfx.effects.audio import AudioReactiveEffect, FREQUENCY_RANGES
 from ledfx.effects.colorrainbow import ColorRainbowEffect 
 import voluptuous as vol
 import numpy as np
+import time
+import statistics
 
 class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
 
@@ -17,13 +19,68 @@ class DranoBeatAudioEffect(AudioReactiveEffect, ColorRainbowEffect):
             20)
 
     def audio_data_updated(self, data):
+        output = np.zeros(shape=(self.pixel_count, 3))
+        for i in range(self.pixel_count):
+            output[i] = [255, 255, 0]
+        self.pixels = output
+"""        if not hasattr(self, 'beat'):
+            print("INIT!")
+            self.sampleStartTime = time.time()
+            self.maxBPM = 180
+            self.samples = []
+            self.tick_samples = []
+            self.bpm_list = []
+            self.colormap = np.zeros(shape=(self.pixel_count, 3))
+            self.tick_size = 60 / (self.maxBPM*10)
+            self.tick_start = self.sampleStartTime
+            self.prev_beat = self.sampleStartTime
+            self.beat = False
+
+        now = time.time()
+        if not hasattr(self, 'next_beat'):
+            print("setting next_beat")
+            self.next_beat = now
 
         # Grab the filtered and interpolated melbank data
-        magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
-        # if magnitude > 0.7:
-        #     self.pixels = self.apply_gradient(1.0)
-        # else:
-        #     self.pixels = self.apply_gradient(0.0)
-        if magnitude > 1.0:
-            magnitude = 1.0
-        self.pixels = self.apply_rainbow(magnitude)
+ #       magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
+
+#        self.updateBeat(magnitude, now)
+        if abs(now - self.next_beat) < .1:
+            print(self.pixels[40])
+            self.pixels = self.apply_rainbow()
+        else:
+#            self.pixels = np.zeros(shape=(self.pixel_count, 3))
+            print(self.pixels[40])"""
+
+"""    def updateBeat(self, y, now):
+        self.tick_samples.append(y)
+        if now - self.tick_start > self.tick_size:
+            tick_avg = statistics.mean(self.tick_samples)
+            self.samples.append(tick_avg)
+            culmative_avg = statistics.mean(self.samples)
+            if (tick_avg > .1 and tick_avg > culmative_avg * 1.5):
+                if now - self.prev_beat > 60/self.maxBPM:
+                    print('beat')
+                    bpm = int(60 / (now - self.prev_beat))
+                    bpm_avg = 60
+                    if len(self.bpm_list) < 4:
+                        if bpm > 40:
+                            print("Found bpm: {}".format(bpm))
+                            self.bpm_list.append(bpm)
+                            bpm_avg = statistics.mean(self.bpm_list)
+                    else:
+                        bpm_avg = statistics.mean(self.bpm_list)
+                        if abs(bpm_avg - bpm) < 35:
+                            print("appending bpm: {}".format(bpm))
+                            self.bpm_list.append(bpm)
+                    self.prev_beat = now
+                    self.next_beat = now + 60/bpm_avg
+                    print("average bpm: {}".format(bpm_avg))
+                    self.beat = True
+            if len(self.samples) > 50:
+                self.samples = self.samples[25:]
+            if len(self.bpm_list) > 24:
+                self.bpm_list = self.bpm_list[8:]
+            self.tick_samples = []
+            self.tick_start = now"""
+

@@ -17,7 +17,7 @@ class ColorRainbowEffect(Effect):
         vol.Optional('gradient_method', description='Function used to generate gradient', default = 'cubic_ease'): vol.In(["cubic_ease", "bezier"]),
     })
 
-    def apply_rainbow(self, y):
+    def apply_rainbow(self):
         output = np.zeros(shape=(self.pixel_count, 3))
         rainbow = []
         rainbow.append([255, 0, 0])
@@ -31,6 +31,13 @@ class ColorRainbowEffect(Effect):
         for i in range(self.pixel_count):
             index = int(i / pixels_per_color)
             if index >= len(rainbow):
-              index = len(rainbow) - 1
-            output[i] = [rainbow[index][0]*y, rainbow[index][1]*y, rainbow[index][2]*y]
+                index = len(rainbow) - 1
+            output[i] = [rainbow[index][0], rainbow[index][1], rainbow[index][2]]
+            self.colormap[i] = output[i]
         return output
+"""            for i in range(len(self.colormap)): 
+                for j in range(3):
+                    self.colormap[i][j] -= 180
+                    if self.colormap[i][j] < 0:
+                        self.colormap[i][j] = 0
+                output[i] = [self.colormap[i][0], self.colormap[i][1], self.colormap[i][2]]"""
