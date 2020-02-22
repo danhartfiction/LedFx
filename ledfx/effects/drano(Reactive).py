@@ -8,8 +8,8 @@ class DranoBeatAudioEffect(AudioReactiveEffect, GradientEffect):
     NAME = "DranoBeat"
     CONFIG_SCHEMA = vol.Schema({
         vol.Optional('frequency_range', description='Frequency range for the beat detection', default = 'bass'): vol.In(list(FREQUENCY_RANGES.keys())),
-        print("Testing!")
     })
+    print("Testing!")
 
     def config_updated(self, config):
         self._frequency_range = np.linspace(
