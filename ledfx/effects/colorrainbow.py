@@ -131,7 +131,7 @@ class ColorRainbowEffect(Effect):
         self._gradient_curve = None
 
     def apply_rainbow(self, y):
-        output = []
+        output = list()
         for pixel in range(self.pixel_count):
             output.append([0, 255, 0])
 
@@ -140,6 +140,7 @@ class ColorRainbowEffect(Effect):
 
         # Apply and roll the gradient if necessary
         output = (self._gradient_curve[:][::1]*y).T
+        print(type(output))
         self._roll_gradient()
 
         return output
