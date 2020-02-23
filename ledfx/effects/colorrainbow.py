@@ -19,8 +19,7 @@ class ColorRainbowEffect(Effect):
 
     def apply_rainbow(self, dt):
         output = np.zeros(shape=(self.pixel_count, 3))
-        if dt < .1:
-            print("beat")
+        if dt: 
             rainbow = []
             rainbow.append([255, 0, 0])
             rainbow.append([255, 165, 0])
@@ -37,10 +36,9 @@ class ColorRainbowEffect(Effect):
                 output[i] = [rainbow[index][0], rainbow[index][1], rainbow[index][2]]
                 self.colormap[i] = output[i]
         else:
-            print("")
             for i in range(len(self.colormap)): 
                 for j in range(3):
-                    self.colormap[i][j] -= 35
+                    self.colormap[i][j] -= 1 
                     if self.colormap[i][j] < 0:
                         self.colormap[i][j] = 0
             output[i] = [self.colormap[i][0], self.colormap[i][1], self.colormap[i][2]]
